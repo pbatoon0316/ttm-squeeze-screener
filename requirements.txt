@@ -1,5 +1,4 @@
 yfinance
 pandas
 datetime
-time
 streamlit
