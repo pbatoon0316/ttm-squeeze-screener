@@ -167,6 +167,7 @@ def squeeze_screener(tickers):
   print('Execution time:', round(res/60,2), 'minutes')
 
   return squeeze_tickers
+
 targets = squeeze_screener(sp500)
 targets = targets.set_index('ticker')
 targets = targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
