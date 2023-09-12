@@ -216,41 +216,4 @@ with col1:
     <!-- TradingView Widget END -->
     ''', 
     height=700)
-  
-  components.html('''
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container">
-    <div class="tradingview-widget-container__widget"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-    {
-    "symbols": [
-    {
-      "description": "S&P500",
-      "proName": "CME_MINI:ES1!"
-    },
-    {
-      "description": "NASDAQ",
-      "proName": "CME_MINI:NQ1!"
-    },
-    {
-      "description": "RUSSEL",
-      "proName": "CME_MINI:RTY1!"
-    },
-    {
-      "description": "DOW",
-      "proName": "CBOT_MINI:YM1!"
-    },
-    {
-      "description": "VIX",
-      "proName": "TVC:VIX"
-    }
-    ],
-    "colorTheme": "dark",
-    "isTransparent": true,
-    "showSymbolLogo": true,
-    "locale": "en"
-    }
-    </script>
-    </div>
-    <!-- TradingView Widget END -->''')
 
