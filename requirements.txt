@@ -2,3 +2,4 @@ yfinance
 pandas
 datetime
 streamlit
+finta
