@@ -289,7 +289,7 @@ with tab1:
 
 with tab2:
 
-    turtle_targets = turtle_targets(sp500)
+    turtle_targets = trend_screener(sp500)
     turtle_targets = turtle_targets.set_index('ticker')
     turtle_targets = turtle_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
     turtle_targets = turtle_targets[turtle_targets['avg volume'] >= 1]
