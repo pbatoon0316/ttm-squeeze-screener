@@ -269,9 +269,9 @@ with tab1:
         "withdateranges": true,
         "allow_symbol_change": true,
         "studies": [
-            "STD;Bollinger_Bands",
-            "STD;Keltner_Channels",
-            "STD;MA%Ribbon"
+            "STD;Donchian_Channels",
+            "STD;MA%Ribbon",
+            "STD;RSI"
         ],
         "hide_volume": true,
         "container_id": "tradingview_e049b"
