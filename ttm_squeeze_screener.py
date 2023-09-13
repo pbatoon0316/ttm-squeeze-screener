@@ -236,7 +236,6 @@ with tab1:
 
     squeeze_targets = squeeze_screener(sp500)
     squeeze_targets = squeeze_targets.set_index('ticker')
-    squeeze_targets = squeeze_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
     squeeze_targets = squeeze_targets[squeeze_targets['avg volume'] >= 1]
 
     col1, col2 = st.columns([2,1])
