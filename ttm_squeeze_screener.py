@@ -291,6 +291,7 @@ with tab2:
 
     turtle_targets = trend_screener(sp500)
     turtle_targets = turtle_targets.set_index('ticker')
+    turtle_targets = turtle_targets[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
     turtle_targets = turtle_targets[turtle_targets['avg volume'] >= 1]
 
     col1, col2 = st.columns([2,1])
