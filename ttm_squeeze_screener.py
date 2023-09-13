@@ -4,6 +4,7 @@ import datetime as dt
 import time
 import streamlit as st
 import streamlit.components.v1 as components
+from finta import TA
 
 # Set the display option to show 2 decimal places and 1000 rows
 pd.set_option('display.float_format', '{:.2f}'.format)
@@ -168,53 +169,171 @@ def squeeze_screener(tickers):
 
   return squeeze_tickers
 
-targets = squeeze_screener(sp500)
-targets = targets.set_index('ticker')
-targets = targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
-targets = targets[targets['avg volume'] >= 1]
+# Define Trend function and download data
+@st.cache_data(ttl=6*3600)
+def trend_screener(tickers, period_length='50d', interval_type='1d'):
 
-# Streamlit Page Layout
-col1, col2 = st.columns([2,1])
-with col2:
-    inner_col1, inner_col2 = st.columns([3,1])
-    with inner_col1:
-        st.table(targets)
-    with inner_col2:
-        view_ticker = st.radio('Ticker', options = targets.index)
+  # start timer
+  st = time.time()
 
-# Tradingview embed
-with col1:
-  components.html(f'''
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container">
-    <div id="tradingview_e049b"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-    new TradingView.widget(
-    {{
-    "width": "100%",
-    "height": 700,
-    "symbol": "{view_ticker}",
-    "interval": "D",
-    "timezone": "America/Los_Angeles",
-    "theme": "dark",
-    "style": "9",
-    "locale": "en",
-    "enable_publishing": false,
-    "withdateranges": true,
-    "allow_symbol_change": true,
-    "studies": [
-        "STD;Bollinger_Bands",
-        "STD;Keltner_Channels",
-        "STD;MA%Ribbon"
-    ],
-    "hide_volume": true,
-    "container_id": "tradingview_e049b"
-    }}
-    );
-    </script>
-    </div>
-    <!-- TradingView Widget END -->
-    ''', 
-    height=700)
+  # Download historical data for each ticker as a bulk package (MultiIndex df)
+  data = yf.download(tickers=tickers, period=period_length, interval=interval_type)
 
+  # Intiialize output variable
+  stocks = pd.DataFrame()
+
+  # For all tickers submitted, download historical stock data, and calculate
+  # technical indiators using the parameters above
+  for ticker in tickers:
+    # Create a working dataframe for the active ticker. This transforms it to a Single Index df
+    df = data.loc[:, (slice(None), ticker)].copy()
+    df.columns = df.columns.droplevel(1)
+
+    # Convert columns to lowercase for finta/TA
+    df.columns = df.columns.str.lower()
+
+    # Add ticker ID column. Calculate Average Volume
+    df['ticker'] = ticker
+    df['avg volume'] = df['volume'].rolling(len(df)).mean() / 1000000
+
+    # Calculate indicators
+    df['rolling high'] = df['close'].rolling(20).max()
+    df['ema'] = TA.EMA(df,period=50)
+    df['ATR'] = TA.ATR(df,period=20)
+    df['rsi'] = TA.RSI(df,period=14)
+    df['long stop'] = df['rolling high'] - 3*df['ATR'] # default long_stop=2, stop*df['rolling high'] #
+
+
+    # Condition 1 = "Open less than prior day low"
+    # Condition 2 = "Current close greatrer than prior day low"
+    c1 = df['close'].iloc[-1] >= df['rolling high'].iloc[-1]
+    c2 = df['close'].iloc[-2] >= df['rolling high'].iloc[-2]
+    c3 = df['close'].iloc[-1] >= df['ema'].iloc[-1]
+
+    # If both conditions are met, store the Ticker
+    if c1 and c2 and c3:
+      print(f'{interval_type} Trending ticker found: {ticker}')
+      stocks = pd.concat([stocks, df.iloc[[-1]]], axis=0)
+
+  try:
+    stocks = stocks.sort_values('avg volume', ascending=False)
+  except:
+    print(f'No tickers found for {interval_type} time interval')
+
+  # Stop timer and report runtime
+  et = time.time()
+  res = et - st
+  print('Execution time:', round(res/60,2), 'minutes')
+
+  return stocks
+
+
+tab1, tab2 = st.tab(['TTM Squeeze','Turtle Trend'])
+
+## Tab1 - TTM Squeeze Layout
+
+with tab1:
+
+    squeeze_targets = squeeze_screener(sp500)
+    squeeze_targets = squeeze_targets.set_index('ticker')
+    squeeze_targets = squeeze_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
+    squeeze_targets = squeeze_targets[squeeze_targets['avg volume'] >= 1]
+
+    col1, col2 = st.columns([2,1])
+    with col2:
+        inner_col1, inner_col2 = st.columns([3,1])
+        with inner_col1:
+            st.table(squeeze_targets)
+        with inner_col2:
+            view_ticker = st.radio('Ticker', options = squeeze_targets.index)
+
+    # Tradingview embed
+    with col1:
+      components.html(f'''
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container">
+        <div id="tradingview_e049b"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+        new TradingView.widget(
+        {{
+        "width": "100%",
+        "height": 700,
+        "symbol": "{view_ticker}",
+        "interval": "D",
+        "timezone": "America/Los_Angeles",
+        "theme": "dark",
+        "style": "9",
+        "locale": "en",
+        "enable_publishing": false,
+        "withdateranges": true,
+        "allow_symbol_change": true,
+        "studies": [
+            "STD;Bollinger_Bands",
+            "STD;Keltner_Channels",
+            "STD;MA%Ribbon"
+        ],
+        "hide_volume": true,
+        "container_id": "tradingview_e049b"
+        }}
+        );
+        </script>
+        </div>
+        <!-- TradingView Widget END -->
+        ''', 
+        height=700)
+
+
+
+## Tab2 - Turtle Trend
+
+with tab2:
+
+    turtle_targets = turtle_targets(sp500)
+    turtle_targets = turtle_targets.set_index('ticker')
+    turtle_targets = turtle_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
+    turtle_targets = turtle_targets[turtle_targets['avg volume'] >= 1]
+
+    col1, col2 = st.columns([2,1])
+    with col2:
+        inner_col1, inner_col2 = st.columns([3,1])
+        with inner_col1:
+            st.table(turtle_targets)
+        with inner_col2:
+            view_ticker = st.radio('Ticker', options = turtle_targets.index)
+
+    # Tradingview embed
+    with col1:
+      components.html(f'''
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container">
+        <div id="tradingview_e049b"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+        new TradingView.widget(
+        {{
+        "width": "100%",
+        "height": 700,
+        "symbol": "{view_ticker}",
+        "interval": "D",
+        "timezone": "America/Los_Angeles",
+        "theme": "dark",
+        "style": "9",
+        "locale": "en",
+        "enable_publishing": false,
+        "withdateranges": true,
+        "allow_symbol_change": true,
+        "studies": [
+            "STD;Bollinger_Bands",
+            "STD;Keltner_Channels",
+            "STD;MA%Ribbon"
+        ],
+        "hide_volume": true,
+        "container_id": "tradingview_e049b"
+        }}
+        );
+        </script>
+        </div>
+        <!-- TradingView Widget END -->
+        ''', 
+        height=700)
