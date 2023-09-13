@@ -228,7 +228,7 @@ def trend_screener(tickers, period_length='50d', interval_type='1d'):
   return stocks
 
 
-tab1, tab2 = st.tab(['TTM Squeeze','Turtle Trend'])
+tab1, tab2 = st.tabs(['TTM Squeeze','Turtle Trend'])
 
 ## Tab1 - TTM Squeeze Layout
 
