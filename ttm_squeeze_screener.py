@@ -65,14 +65,14 @@ sp500 = [
 
 # Define Squeeze Function and download data
 @st.cache_data(ttl=3600)
-def squeeze_screener(tickers):
+def squeeze_screener(tickers , atr_mult=1.4):
 
   # start timer
   st = time.time()
 
   # Indicator parameters
   period = 20       # Indicator smoothing legth for BB and ATR
-  atr_mult = 1.4    # ATR Multiplier for Keltner Channels
+  atr_mult = atr_mult    # ATR Multiplier for Keltner Channels
   bb_stdev = 2      # Std multiplier for BB
 
   # Download historical data for each ticker as a bulk package (MultiIndex df)
@@ -228,60 +228,67 @@ def trend_screener(tickers, period_length='50d', interval_type='1d'):
   return stocks
 
 
+## Download data and set up data tables
+
 tab1, tab2 = st.tabs(['TTM Squeeze','Turtle Trend'])
 
 ## Tab1 - TTM Squeeze Layout
 
 with tab1:
+  
+  col1, col2 = st.columns([2,1])
 
-    squeeze_targets = squeeze_screener(sp500)
-    squeeze_targets = squeeze_targets.set_index('ticker')
-    squeeze_targets = squeeze_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
-    squeeze_targets = squeeze_targets[squeeze_targets['avg volume'] >= 1]
+  with col2:
+      
+      kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
+      squeeze_targets = squeeze_screener(sp500, kc)
+      squeeze_targets = squeeze_targets.set_index('ticker')
+      squeeze_targets = squeeze_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
+      squeeze_targets = squeeze_targets[squeeze_targets['avg volume'] >= 1]
 
-    col1, col2 = st.columns([2,1])
-    with col2:
-        inner_col1, inner_col2 = st.columns([3,1])
-        with inner_col1:
-            st.table(squeeze_targets)
-        with inner_col2:
-            view_ticker = st.radio('Ticker', options = squeeze_targets.index)
 
-    # Tradingview embed
-    with col1:
-      components.html(f'''
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-        <div id="tradingview_e049b"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script type="text/javascript">
-        new TradingView.widget(
-        {{
-        "width": "100%",
-        "height": 700,
-        "symbol": "{view_ticker}",
-        "interval": "D",
-        "timezone": "America/Los_Angeles",
-        "theme": "dark",
-        "style": "9",
-        "locale": "en",
-        "enable_publishing": false,
-        "withdateranges": true,
-        "allow_symbol_change": true,
-        "studies": [
-            "STD;Bollinger_Bands",
-            "STD;Keltner_Channels",
-            "STD;MA%Ribbon"
-        ],
-        "hide_volume": true,
-        "container_id": "tradingview_e049b"
-        }}
-        );
-        </script>
-        </div>
-        <!-- TradingView Widget END -->
-        ''', 
-        height=700)
+      inner_col1, inner_col2 = st.columns([3,1])
+
+      with inner_col1:
+          st.table(squeeze_targets)
+      with inner_col2:
+          view_ticker = st.radio('Ticker', options = squeeze_targets.index)
+
+  # Tradingview embed
+  with col1:
+    components.html(f'''
+      <!-- TradingView Widget BEGIN -->
+      <div class="tradingview-widget-container">
+      <div id="tradingview_e049b"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {{
+      "width": "100%",
+      "height": 700,
+      "symbol": "{view_ticker}",
+      "interval": "D",
+      "timezone": "America/Los_Angeles",
+      "theme": "dark",
+      "style": "9",
+      "locale": "en",
+      "enable_publishing": false,
+      "withdateranges": true,
+      "allow_symbol_change": true,
+      "studies": [
+          "STD;Bollinger_Bands",
+          "STD;Keltner_Channels",
+          "STD;MA%Ribbon"
+      ],
+      "hide_volume": true,
+      "container_id": "tradingview_e049b"
+      }}
+      );
+      </script>
+      </div>
+      <!-- TradingView Widget END -->
+      ''', 
+      height=700)
 
 
 
