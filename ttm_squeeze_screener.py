@@ -125,8 +125,8 @@ def squeeze_screener(tickers , atr_mult=1.4):
     df['Trend'] = None
 
     # Condition = Multiple EMAs are stacked upwards or downward
-    c1_up = (df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
-    c1_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
+    c1_up = True #(df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
+    c1_down = True #(df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
 
     # Condition = Squeeze fired today (0 day prior)
     c2 = df['Squeeze'].iloc[-3]==True and df['Squeeze'].iloc[-2]==True and df['Squeeze'].iloc[-1]==False
