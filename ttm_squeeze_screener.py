@@ -161,7 +161,7 @@ def squeeze_screener(tickers , atr_mult=1.4):
         squeeze_tickers = pd.concat([squeeze_tickers, df.iloc[[-1]]], axis=0)
         
     elif c2 or c3 or c4 or c5:
-        df.loc[df.index[-1], 'Trend'] = None
+        df.loc[df.index[-1], 'Trend'] = 'Mixed'
         if c2:
           df.loc[df.index[-1], 'Condition'] = '0 day'
         elif c3:
@@ -257,7 +257,7 @@ with tab1:
       with squeeze_config_col1:
         kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
       with squeeze_config_col2:
-        vol = st.number_input('Volume', min_value=1, value=2)
+        vol = st.number_input('Volume', min_value=1, value=3)
       squeeze_targets = squeeze_screener(sp500, kc)
       squeeze_targets = squeeze_targets.set_index('ticker')
       squeeze_targets = squeeze_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
