@@ -162,6 +162,15 @@ def squeeze_screener(tickers , atr_mult=1.4):
         
     elif c2 or c3 or c4 or c5:
         df.loc[df.index[-1], 'Trend'] = None
+        if c2:
+          df.loc[df.index[-1], 'Condition'] = '0 day'
+        elif c3:
+          df.loc[df.index[-1], 'Condition'] = '1 day'
+        elif c4:
+          df.loc[df.index[-1], 'Condition'] = '2 day'
+        elif c5:
+          df.loc[df.index[-1], 'Condition'] = 'Accumulating'
+          
         squeeze_tickers = pd.concat([squeeze_tickers, df.iloc[[-1]]], axis=0)
 
   squeeze_tickers = squeeze_tickers.sort_values('avg volume', ascending=False)
