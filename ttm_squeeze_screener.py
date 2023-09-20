@@ -125,8 +125,8 @@ def squeeze_screener(tickers , atr_mult=1.4):
     df['Trend'] = None
 
     # Condition = Multiple EMAs are stacked upwards or downward
-    c1_up = True #(df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
-    c1_down = True #(df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
+    c1_up = (df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
+    c1_down =(df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
 
     # Condition = Squeeze fired today (0 day prior)
     c2 = df['Squeeze'].iloc[-3]==True and df['Squeeze'].iloc[-2]==True and df['Squeeze'].iloc[-1]==False
@@ -158,6 +158,10 @@ def squeeze_screener(tickers , atr_mult=1.4):
           df.loc[df.index[-1], 'Condition'] = 'Accumulating'
 
         #print(f'{ticker}')
+        squeeze_tickers = pd.concat([squeeze_tickers, df.iloc[[-1]]], axis=0)
+        
+    elif c2 or c3 or c4 or c5:
+        df.loc[df.index[-1], 'Trend'] = None
         squeeze_tickers = pd.concat([squeeze_tickers, df.iloc[[-1]]], axis=0)
 
   squeeze_tickers = squeeze_tickers.sort_values('avg volume', ascending=False)
@@ -240,11 +244,15 @@ with tab1:
 
   with col2:
       
-      kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
+      squeeze_config_col1, squeeze_config_col2 = st.columns(2)
+      with squeeze_config_col1:
+        kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
+      with squeeze_config_col2:
+        vol = st.number_input('Volume', min_value=1, value=2)
       squeeze_targets = squeeze_screener(sp500, kc)
       squeeze_targets = squeeze_targets.set_index('ticker')
       squeeze_targets = squeeze_targets[['avg volume','close','Condition', 'Trend']].sort_values(by=['Condition','avg volume'], ascending=[True,False])
-      squeeze_targets = squeeze_targets[squeeze_targets['avg volume'] >= 1]
+      squeeze_targets = squeeze_targets[squeeze_targets['avg volume'] >= vol]
 
 
       inner_col1, inner_col2 = st.columns([3,1])
@@ -265,7 +273,7 @@ with tab1:
       new TradingView.widget(
       {{
       "width": "100%",
-      "height": 700,
+      "height": 600,
       "symbol": "{view_ticker}",
       "interval": "D",
       "timezone": "America/Los_Angeles",
@@ -288,7 +296,7 @@ with tab1:
       </div>
       <!-- TradingView Widget END -->
       ''', 
-      height=700)
+      height=600)
 
 
 
@@ -320,7 +328,7 @@ with tab2:
         new TradingView.widget(
         {{
         "width": "100%",
-        "height": 700,
+        "height": 600,
         "symbol": "{view_ticker}",
         "interval": "D",
         "timezone": "America/Los_Angeles",
@@ -343,4 +351,4 @@ with tab2:
         </div>
         <!-- TradingView Widget END -->
         ''', 
-        height=700)
+        height=600)
