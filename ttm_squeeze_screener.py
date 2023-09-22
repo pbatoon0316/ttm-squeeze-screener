@@ -150,17 +150,15 @@ def squeeze_screener(tickers, atr_mult=1.4):
     ### Initialized 'Condition' column (0 day, 1 day, or 2 day)
     df['Condition'] = None
     df['EMA Trend'] = None
-	df['TTM Trend'] = None
+		df['TTM Trend'] = None
 
     # Condition = Multiple EMAs are stacked upwards or downward
     c_stacked_ema_up = (df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
+		c_stacked_ema_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
 
-	c_stacked_ema_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
-
-
-	# Condition = TTM Histogram positive or negative
-	c_ttmhist_up = df['TTM Hist'] > 0
-	c_ttmhist_down = df['TTM Hist'] < 0
+		# Condition = TTM Histogram positive or negative
+		c_ttmhist_up = df['TTM Hist'] > 0
+		c_ttmhist_down = df['TTM Hist'] < 0
 
     # Condition = Squeeze fired today (0 day prior)
     c_sq_fire0 = df['Squeeze'].iloc[-3]==True and df['Squeeze'].iloc[-2]==True and df['Squeeze'].iloc[-1]==False
@@ -179,23 +177,23 @@ def squeeze_screener(tickers, atr_mult=1.4):
         df.loc[df.index[-1], 'EMA Trend'] = 'Up'
       else:
         df.loc[df.index[-1], 'EMA Trend'] = 'Down'
-	else:
-		df.loc[df.index[-1], 'EMA Trend'] = 'Mixed'
+		else:
+			df.loc[df.index[-1], 'EMA Trend'] = 'Mixed'
 
-	if c_ttmhist_up:
-		df.loc[df.index[-1], 'TTM Trend'] = 'Up'
-	else:
-		df.loc[df.index[-1], 'TTM Trend'] = 'Down'
+		if c_ttmhist_up:
+			df.loc[df.index[-1], 'TTM Trend'] = 'Up'
+		else:
+			df.loc[df.index[-1], 'TTM Trend'] = 'Down'
 		
-	if c_sq_fire0 or c_sq_fire1 or c_sq_fire2 or c_sq:
-		if c_sq_fire0:
-			df.loc[df.index[-1], 'Condition'] = '0 day'
-		elif c_sq_fire1:
-			df.loc[df.index[-1], 'Condition'] = '1 day'
-		elif c_sq_fire2:
-			df.loc[df.index[-1], 'Condition'] = '2 day'
-		elif c_sq:
-			df.loc[df.index[-1], 'Condition'] = 'Squeezed'
+		if c_sq_fire0 or c_sq_fire1 or c_sq_fire2 or c_sq:
+			if c_sq_fire0:
+				df.loc[df.index[-1], 'Condition'] = '0 day'
+			elif c_sq_fire1:
+				df.loc[df.index[-1], 'Condition'] = '1 day'
+			elif c_sq_fire2:
+				df.loc[df.index[-1], 'Condition'] = '2 day'
+			elif c_sq:
+				df.loc[df.index[-1], 'Condition'] = 'Squeezed'
 
     squeeze_tickers = pd.concat([squeeze_tickers, df.iloc[[-1]]], axis=0)
 
