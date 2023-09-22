@@ -197,7 +197,7 @@ def squeeze_screener(tickers, atr_mult=1.4):
 
     squeeze_tickers = pd.concat([squeeze_tickers, df.iloc[[-1]]], axis=0)
 
-  squeeze_tickers = squeeze_tickers.sort_values('avg volume', ascending=False)
+  squeeze_tickers = squeeze_tickers.sort_values('avg volume', ascending=False).dropna()
 
   # Stop timer and report runtime
   et = time.time()
