@@ -281,9 +281,9 @@ with tab1:
     squeeze_config_col1, squeeze_config_col2 = st.columns(2)
 	
     with squeeze_config_col1:
-		kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
+        kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
     with squeeze_config_col2:
-		vol = st.number_input('Volume', min_value=1, value=3)
+        vol = st.number_input('Volume', min_value=1, value=3)
 		
     squeeze_targets = squeeze_screener(combined_list, kc)
     squeeze_targets = squeeze_targets.set_index('ticker')
