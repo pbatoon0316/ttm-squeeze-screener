@@ -1,5 +1,4 @@
 import time
-
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
@@ -190,7 +189,7 @@ def squeeze_screener(tickers, atr_mult=1.4):
 
 		if c_ttmhist_up:
 			df.loc[df.index[-1], 'TTM Trend'] = 'Up'
-		else
+		else:
 			df.loc[df.index[-1], 'TTM Trend'] = 'Down'
 		
 		if c_sq_fire0 or c_sq_fire1 or c_sq_fire2 or c_sq:
