@@ -151,11 +151,11 @@ def squeeze_screener(tickers, atr_mult=1.4):
     df['Condition'] = None
     df['EMA Trend'] = None
     df['TTM Trend'] = None
-    
+
     # Condition = Multiple EMAs are stacked upwards or downward
     c_stacked_ema_up = (df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
     c_stacked_ema_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
-    
+
     # Condition = TTM Histogram positive or negative
     c_ttmhist_up = df['TTM Hist'] > 0
     c_ttmhist_down = df['TTM Hist'] < 0
@@ -177,23 +177,23 @@ def squeeze_screener(tickers, atr_mult=1.4):
         df.loc[df.index[-1], 'EMA Trend'] = 'Up'
       else:
         df.loc[df.index[-1], 'EMA Trend'] = 'Down'
-		else:
-			df.loc[df.index[-1], 'EMA Trend'] = 'Mixed'
+    else:
+      df.loc[df.index[-1], 'EMA Trend'] = 'Mixed'
 
-		if c_ttmhist_up:
-			df.loc[df.index[-1], 'TTM Trend'] = 'Up'
-		else:
-			df.loc[df.index[-1], 'TTM Trend'] = 'Down'
-		
-		if c_sq_fire0 or c_sq_fire1 or c_sq_fire2 or c_sq:
-			if c_sq_fire0:
-				df.loc[df.index[-1], 'Condition'] = '0 day'
-			elif c_sq_fire1:
-				df.loc[df.index[-1], 'Condition'] = '1 day'
-			elif c_sq_fire2:
-				df.loc[df.index[-1], 'Condition'] = '2 day'
-			elif c_sq:
-				df.loc[df.index[-1], 'Condition'] = 'Squeezed'
+    if c_ttmhist_up:
+      df.loc[df.index[-1], 'TTM Trend'] = 'Up'
+    else:
+      df.loc[df.index[-1], 'TTM Trend'] = 'Down'
+
+    if c_sq_fire0 or c_sq_fire1 or c_sq_fire2 or c_sq:
+      if c_sq_fire0:
+        df.loc[df.index[-1], 'Condition'] = '0 day'
+      elif c_sq_fire1:
+        df.loc[df.index[-1], 'Condition'] = '1 day'
+      elif c_sq_fire2:
+        df.loc[df.index[-1], 'Condition'] = '2 day'
+      elif c_sq:
+        df.loc[df.index[-1], 'Condition'] = 'Squeezed'
 
     squeeze_tickers = pd.concat([squeeze_tickers, df.iloc[[-1]]], axis=0)
 
@@ -265,7 +265,7 @@ def trend_screener(tickers, period_length='50d', interval_type='1d'):
   print('Execution time:', round(res / 60, 2), 'minutes')
 
   return stocks
-	
+
 ## Download data and set up data tables
 
 tab1, tab2 = st.tabs(['TTM Squeeze', 'Turtle Trend'])
@@ -277,14 +277,12 @@ with tab1:
   col1, col2 = st.columns([2, 1])
 
   with col2:
-
     squeeze_config_col1, squeeze_config_col2 = st.columns(2)
-	
     with squeeze_config_col1:
         kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
     with squeeze_config_col2:
         vol = st.number_input('Volume', min_value=1, value=3)
-		
+
     squeeze_targets = squeeze_screener(combined_list, kc)
     squeeze_targets = squeeze_targets.set_index('ticker')
     squeeze_targets = squeeze_targets[[
