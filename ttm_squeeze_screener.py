@@ -150,15 +150,15 @@ def squeeze_screener(tickers, atr_mult=1.4):
     ### Initialized 'Condition' column (0 day, 1 day, or 2 day)
     df['Condition'] = None
     df['EMA Trend'] = None
-		df['TTM Trend'] = None
-
+    df['TTM Trend'] = None
+    
     # Condition = Multiple EMAs are stacked upwards or downward
     c_stacked_ema_up = (df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
-		c_stacked_ema_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
-
-		# Condition = TTM Histogram positive or negative
-		c_ttmhist_up = df['TTM Hist'] > 0
-		c_ttmhist_down = df['TTM Hist'] < 0
+    c_stacked_ema_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
+    
+    # Condition = TTM Histogram positive or negative
+    c_ttmhist_up = df['TTM Hist'] > 0
+    c_ttmhist_down = df['TTM Hist'] < 0
 
     # Condition = Squeeze fired today (0 day prior)
     c_sq_fire0 = df['Squeeze'].iloc[-3]==True and df['Squeeze'].iloc[-2]==True and df['Squeeze'].iloc[-1]==False
