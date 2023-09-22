@@ -143,7 +143,7 @@ def squeeze_screener(tickers, atr_mult=1.4):
     df['Donchian Mid'] = (df['Donchian High'] + df['Donchian Low']) / 2
 
     # Calculate TTM Squeeze
-    df['TTM Hist'] = df['SMA5'] - df['Rolling Mid']
+    df['TTM Hist'] = df['SMA5'] - df['Donchian Mid']
     squeeze_on = (df['BB Low'] > df['Keltner Low']) | (df['BB High'] < df['Keltner High'])
     df['Squeeze'] = squeeze_on
 
