@@ -2,4 +2,4 @@ pandas
 datetime
 streamlit
 finta
-yfinance
+yfinance==0.2.21
