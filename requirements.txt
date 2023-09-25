@@ -1,4 +1,4 @@
-yfinance
+yfinance == 0.2.29
 pandas
 datetime
 streamlit
