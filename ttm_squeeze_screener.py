@@ -84,25 +84,26 @@ combined_list = []
 combined_list = sp500 + etfs
 
 
-# Define Squeeze Function and download data
-@st.cache_data(ttl=3600)
-def squeeze_screener(tickers, atr_mult=1.4):
+# Define Data Download Function
+# Downloads historical data for each ticker as a bulk package (MultiIndex df)
+@st.cache_data(ttl=3500)
+def download_data(tickers):
+  # Download historical stock data for each ticker
+  data = yf.download(tickers=tickers, period='200d')
+  return data
 
-  # start timer
-  st = time.time()
-
-  # Indicator parameters
+# Define Squeeze Screener Function
+@st.cache_data(ttl=3500)
+def squeeze_screener(data, atr_mult=1.4):
+  
+  # Extract each ticker out of the MultiIndex df
+  tickers = list(data.columns.get_level_values(1).unique())
+  
+  #Technical Indicator Parameters
   period = 20  # Indicator smoothing legth for BB and ATR
   atr_mult = atr_mult  # ATR Multiplier for Keltner Channels
   bb_stdev = 2  # Std multiplier for BB
 
-  # Download historical data for each ticker as a bulk package (MultiIndex df)
-  print('Step 1. Downloading tickers')
-  data = yf.download(tickers=tickers, period='200d')
-
-  # For all tickers submitted, download historical stock data, and calculate
-  # technical indiators using the parameters above
-  print('Step 2. Processing data')
   squeeze_tickers = pd.DataFrame()
 
   for ticker in tickers:
@@ -200,28 +201,15 @@ def squeeze_screener(tickers, atr_mult=1.4):
 
   squeeze_tickers = squeeze_tickers.sort_values('avg volume', ascending=False).dropna()
 
-  # Stop timer and report runtime
-  et = time.time()
-  res = et - st
-  print('Execution time:', round(res / 60, 2), 'minutes')
-
   return squeeze_tickers
 
+@st.cache_data(ttl=3500)
+def turtle_screener(data, dc_period=20):
 
-# Define Trend function and download data
-@st.cache_data(ttl=6 * 3600)
-def trend_screener(tickers, period_length='50d', interval_type='1d'):
+  # Extract each ticker out of the MultiIndex df
+  tickers = list(data.columns.get_level_values(1).unique())
 
-  # start timer
-  st = time.time()
-
-  # Download historical data for each ticker as a bulk package (MultiIndex df)
-  data = yf.download(tickers=tickers,
-                     period=period_length,
-                     interval=interval_type)
-
-  # Intiialize output variable
-  stocks = pd.DataFrame()
+  turtle_stocks = pd.DataFrame()
 
   # For all tickers submitted, download historical stock data, and calculate
   # technical indiators using the parameters above
@@ -242,32 +230,34 @@ def trend_screener(tickers, period_length='50d', interval_type='1d'):
     df['ema'] = TA.EMA(df, period=50)
     df['ATR'] = TA.ATR(df, period=20)
     df['rsi'] = TA.RSI(df, period=14)
-    df['long stop'] = df['rolling high'] - 3 * df['ATR']  # default long_stop=2, stop*df['rolling high'] #
+    df['long stop'] = df['rolling high'] - 3 * df['ATR']
 
-    # Condition 1 = "Open less than prior day low"
-    # Condition 2 = "Current close greatrer than prior day low"
+    # Condition 1 = "Previous Close is greater than the prior rolling high, day-1"
+    # Condition 2 = "Previous Close is greater than the prior rolling high, day-2"
+    # Condition 3 = "Previous close is greater than the 50-day EMA"
     c1 = df['close'].iloc[-1] >= df['rolling high'].iloc[-1]
     c2 = df['close'].iloc[-2] >= df['rolling high'].iloc[-2]
     c3 = df['close'].iloc[-1] >= df['ema'].iloc[-1]
 
     # If both conditions are met, store the Ticker
     if c1 and c2 and c3:
-      print(f'{interval_type} Trending ticker found: {ticker}')
-      stocks = pd.concat([stocks, df.iloc[[-1]]], axis=0)
+      turtle_stocks = pd.concat([turtle_stocks, df.iloc[[-1]]], axis=0)
 
   try:
-    stocks = stocks.sort_values('avg volume', ascending=False)
+    turtle_stocks = turtle_stocks.sort_values('avg volume', ascending=False)
   except:
-    print(f'No tickers found for {interval_type} time interval')
+    st.text('No Tickers Found')
 
-  # Stop timer and report runtime
-  et = time.time()
-  res = et - st
-  print('Execution time:', round(res / 60, 2), 'minutes')
+  return turtle_stocks
 
-  return stocks
+
+####################
+####################
+####################
+
 
 ## Download data and set up data tables
+data = download_data(combined_list)
 
 tab1, tab2 = st.tabs(['TTM Squeeze', 'Turtle Trend'])
 
@@ -280,11 +270,11 @@ with tab1:
   with col2:
     squeeze_config_col1, squeeze_config_col2 = st.columns(2)
     with squeeze_config_col1:
-        kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4)
+        kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4,step=0.5)
     with squeeze_config_col2:
-        vol = st.number_input('Volume', min_value=1, value=3)
+        vol = st.number_input('Volume', min_value=0.5, value=3.0)
 
-    squeeze_targets = squeeze_screener(combined_list, kc)
+    squeeze_targets = squeeze_screener(data, kc)
     squeeze_targets = squeeze_targets.set_index('ticker')
     squeeze_targets = squeeze_targets[[
         'avg volume', 'close', 'Condition', 'EMA Trend', 'TTM Trend'
@@ -309,7 +299,7 @@ with tab1:
       new TradingView.widget(
       {{
       "width": "100%",
-      "height": 700,
+      "height": 800,
       "symbol": "{view_ticker}",
       "interval": "D",
       "timezone": "America/Los_Angeles",
@@ -331,24 +321,27 @@ with tab1:
       </script>
       </div>
       <!-- TradingView Widget END -->
-      ''',height=700)
+      ''',height=800)
 
 ## Tab2 - Turtle Trend
 
 with tab2:
-
-  turtle_targets = trend_screener(combined_list)
-  turtle_targets = turtle_targets.set_index('ticker')
-  turtle_targets = turtle_targets[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
-  turtle_targets = turtle_targets[turtle_targets['avg volume'] >= 1]
-
+  
   col1, col2 = st.columns([2, 1])
+
   with col2:
+    vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
+    turtle_targets = turtle_screener(data)
+    turtle_targets = turtle_targets.set_index('ticker')
+    turtle_targets = turtle_targets[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
+    turtle_targets = turtle_targets[turtle_targets['avg volume'] >= vol_turtle]
+
     inner_col1, inner_col2 = st.columns([3, 1])
-    with inner_col1:
-      st.table(turtle_targets)
     with inner_col2:
       view_ticker = st.radio('Ticker', options=turtle_targets.index)
+    with inner_col1:
+      st.table(turtle_targets)
+
 
   # Tradingview embed
   with col1:
@@ -361,7 +354,7 @@ with tab2:
         new TradingView.widget(
         {{
         "width": "100%",
-        "height": 700,
+        "height": 800,
         "symbol": "{view_ticker}",
         "interval": "D",
         "timezone": "America/Los_Angeles",
@@ -383,4 +376,4 @@ with tab2:
         </script>
         </div>
         <!-- TradingView Widget END -->
-        ''', height=700)
+        ''', height=800)
