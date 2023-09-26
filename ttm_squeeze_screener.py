@@ -299,7 +299,7 @@ with tab1:
       new TradingView.widget(
       {{
       "width": "100%",
-      "height": 800,
+      "height": 700,
       "symbol": "{view_ticker}",
       "interval": "D",
       "timezone": "America/Los_Angeles",
@@ -321,7 +321,7 @@ with tab1:
       </script>
       </div>
       <!-- TradingView Widget END -->
-      ''',height=800)
+      ''',height=700)
 
 ## Tab2 - Turtle Trend
 
@@ -354,7 +354,7 @@ with tab2:
         new TradingView.widget(
         {{
         "width": "100%",
-        "height": 800,
+        "height": 700,
         "symbol": "{view_ticker}",
         "interval": "D",
         "timezone": "America/Los_Angeles",
@@ -376,4 +376,4 @@ with tab2:
         </script>
         </div>
         <!-- TradingView Widget END -->
-        ''', height=800)
+        ''', height=700)
