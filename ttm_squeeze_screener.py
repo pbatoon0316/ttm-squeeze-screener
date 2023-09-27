@@ -1,9 +1,9 @@
-import time
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 import yfinance as yf
 from finta import TA
+import random
 
 # Set the display option to show 2 decimal places and 1000 rows
 pd.set_option('display.float_format', '{:.2f}'.format)
@@ -377,7 +377,7 @@ with tab2:
   col1, col2 = st.columns([2, 1])
 
   with col2:
-    vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25, key=2)    
+    vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
     turtle_targets = turtle_screener(data)
     turtle_targets = turtle_targets.set_index('ticker')
     turtle_targets = turtle_targets[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
@@ -385,7 +385,7 @@ with tab2:
 
     inner_col1, inner_col2 = st.columns([3, 1])
     with inner_col2:
-      view_ticker = st.radio('Ticker', options=turtle_targets.index, key=2)
+      view_ticker = st.radio('Ticker', options=turtle_targets.index)
     with inner_col1:
       st.table(turtle_targets)
 
@@ -432,7 +432,7 @@ with tab3:
   col1, col2 = st.columns([2, 1])
 
   with col2:
-    vol_turtle_sh = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25, key=3)
+    vol_turtle_sh = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25, key=random.randint(1,1000))
     turtle_targets_sh = turtle_screener_sh(data)
     turtle_targets_sh = turtle_targets_sh.set_index('ticker')
     turtle_targets_sh = turtle_targets_sh[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
@@ -440,7 +440,7 @@ with tab3:
 
     inner_col1, inner_col2 = st.columns([3, 1])
     with inner_col2:
-      view_ticker = st.radio('Ticker', options=turtle_targets_sh.index, key=3)
+      view_ticker = st.radio('Ticker', options=turtle_targets_sh.index, key=random.randint(1,1000))
     with inner_col1:
       st.table(turtle_targets_sh)
 
