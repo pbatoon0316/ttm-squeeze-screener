@@ -282,9 +282,9 @@ def turtle_screener_sh(data, dc_period=20):
     # Condition 1 = "Previous Close is greater than the prior rolling high, day-1"
     # Condition 2 = "Previous Close is greater than the prior rolling high, day-2"
     # Condition 3 = "Previous close is greater than the 50-day EMA"
-    c1 = df['close'].iloc[-1] >= df['rolling high'].iloc[-1]
-    c2 = df['close'].iloc[-2] >= df['rolling high'].iloc[-2]
-    c3 = df['close'].iloc[-1] >= df['ema'].iloc[-1]
+    c1 = df['close'].iloc[-1] <= df['rolling high'].iloc[-1]
+    c2 = df['close'].iloc[-2] <= df['rolling high'].iloc[-2]
+    c3 = df['close'].iloc[-1] <= df['ema'].iloc[-1]
 
     # If both conditions are met, store the Ticker
     if c1 and c2 and c3:
