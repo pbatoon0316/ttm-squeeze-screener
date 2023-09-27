@@ -306,7 +306,7 @@ def turtle_screener_sh(data, dc_period=20):
 ## Download data and set up data tables
 data = download_data(combined_list)
 
-tab1, tab2 = st.tabs(['TTM Squeeze', 'Turtle Trend', 'Turtle Trend Short'])
+tab1, tab2, tab3 = st.tabs(['TTM Squeeze', 'Turtle Trend', 'Turtle Trend Short'])
 
 ## Tab1 - TTM Squeeze Layout
 
@@ -427,7 +427,7 @@ with tab2:
 
 ## Tab3 - Turtle Trend Short
 
-with tab2:
+with tab3:
   
   col1, col2 = st.columns([2, 1])
 
