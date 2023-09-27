@@ -440,7 +440,7 @@ with tab3:
 
     inner_col1, inner_col2 = st.columns([3, 1])
     with inner_col2:
-      view_ticker = st.radio('Ticker', options=turtle_targets_sh.index, key=random.randint(1,1000))
+      view_ticker_sh = st.radio('Ticker', options=turtle_targets_sh.index, key=random.randint(1,1000))
     with inner_col1:
       st.table(turtle_targets_sh)
 
@@ -457,7 +457,7 @@ with tab3:
         {{
         "width": "100%",
         "height": 700,
-        "symbol": "{view_ticker}",
+        "symbol": "{view_ticker_sh}",
         "interval": "D",
         "timezone": "America/Los_Angeles",
         "theme": "dark",
