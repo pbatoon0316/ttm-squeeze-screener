@@ -377,7 +377,7 @@ with tab2:
   col1, col2 = st.columns([2, 1])
 
   with col2:
-    vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
+    vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25, key=2)    
     turtle_targets = turtle_screener(data)
     turtle_targets = turtle_targets.set_index('ticker')
     turtle_targets = turtle_targets[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
@@ -432,7 +432,7 @@ with tab3:
   col1, col2 = st.columns([2, 1])
 
   with col2:
-    vol_turtle_sh = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
+    vol_turtle_sh = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25, key=3)
     turtle_targets_sh = turtle_screener_sh(data)
     turtle_targets_sh = turtle_targets_sh.set_index('ticker')
     turtle_targets_sh = turtle_targets_sh[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
