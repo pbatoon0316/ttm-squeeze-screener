@@ -250,9 +250,8 @@ def turtle_screener(data, dc_period=20):
 
   return turtle_stocks
 
-
 @st.cache_data(ttl=3500)
-def turtle_screener_short(data, dc_period=20):
+def turtle_screener_sh(data, dc_period=20):
 
   # Extract each ticker out of the MultiIndex df
   tickers = list(data.columns.get_level_values(1).unique())
@@ -283,9 +282,9 @@ def turtle_screener_short(data, dc_period=20):
     # Condition 1 = "Previous Close is greater than the prior rolling high, day-1"
     # Condition 2 = "Previous Close is greater than the prior rolling high, day-2"
     # Condition 3 = "Previous close is greater than the 50-day EMA"
-    c1 = df['close'].iloc[-1] <= df['rolling high'].iloc[-1]
-    c2 = df['close'].iloc[-2] <= df['rolling high'].iloc[-2]
-    c3 = df['close'].iloc[-1] <= df['ema'].iloc[-1]
+    c1 = df['close'].iloc[-1] >= df['rolling high'].iloc[-1]
+    c2 = df['close'].iloc[-2] >= df['rolling high'].iloc[-2]
+    c3 = df['close'].iloc[-1] >= df['ema'].iloc[-1]
 
     # If both conditions are met, store the Ticker
     if c1 and c2 and c3:
@@ -298,6 +297,7 @@ def turtle_screener_short(data, dc_period=20):
 
   return turtle_stocks
 
+
 ####################
 ####################
 ####################
@@ -306,7 +306,7 @@ def turtle_screener_short(data, dc_period=20):
 ## Download data and set up data tables
 data = download_data(combined_list)
 
-tab1, tab2, tab3 = st.tabs(['TTM Squeeze', 'Turtle Trend', 'Turtle Trend Short'])
+tab1, tab2 = st.tabs(['TTM Squeeze', 'Turtle Trend', 'Turtle Trend Short'])
 
 ## Tab1 - TTM Squeeze Layout
 
@@ -370,70 +370,15 @@ with tab1:
       <!-- TradingView Widget END -->
       ''',height=700)
 
-## Tab3 - Turtle Trend Short
-
-with tab3:
-  
-  col1, col2 = st.columns([2, 1])
-
-  with col2:
-    vol_turtle_sh = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
-    turtle_targets_sh = turtle_screener(data)
-    turtle_targets_sh = turtle_targets_sh.set_index('ticker')
-    turtle_targets_sh = turtle_targets_sh[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
-    turtle_targets_sh = turtle_targets_sh[turtle_targets_sh['avg volume'] >= vol_turtle_sh]
-
-    inner_col1, inner_col2 = st.columns([3, 1])
-    with inner_col2:
-      view_ticker = st.radio('Ticker', options=turtle_targets_sh.index)
-    with inner_col1:
-      st.table(turtle_targets_sh)
-
-
-  # Tradingview embed
-  with col1:
-    components.html(f'''
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-        <div id="tradingview_e049b"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script type="text/javascript">
-        new TradingView.widget(
-        {{
-        "width": "100%",
-        "height": 700,
-        "symbol": "{view_ticker}",
-        "interval": "D",
-        "timezone": "America/Los_Angeles",
-        "theme": "dark",
-        "style": "9",
-        "locale": "en",
-        "enable_publishing": false,
-        "withdateranges": true,
-        "allow_symbol_change": true,
-        "studies": [
-            "STD;Donchian_Channels",
-            "STD;MA%Ribbon",
-            "STD;RSI"
-        ],
-        "hide_volume": true,
-        "container_id": "tradingview_e049b"
-        }}
-        );
-        </script>
-        </div>
-        <!-- TradingView Widget END -->
-        ''', height=700)
-
 ## Tab2 - Turtle Trend
 
-with tab3:
+with tab2:
   
   col1, col2 = st.columns([2, 1])
 
   with col2:
     vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
-    turtle_targets = turtle_screener_short(data)
+    turtle_targets = turtle_screener(data)
     turtle_targets = turtle_targets.set_index('ticker')
     turtle_targets = turtle_targets[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
     turtle_targets = turtle_targets[turtle_targets['avg volume'] >= vol_turtle]
@@ -479,3 +424,58 @@ with tab3:
         </div>
         <!-- TradingView Widget END -->
         ''', height=700)
+
+## Tab3 - Turtle Trend Short
+
+with tab2:
+  
+  col1, col2 = st.columns([2, 1])
+
+  with col2:
+    vol_turtle_sh = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
+    turtle_targets_sh = turtle_screener_sh(data)
+    turtle_targets_sh = turtle_targets_sh.set_index('ticker')
+    turtle_targets_sh = turtle_targets_sh[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
+    turtle_targets_sh = turtle_targets_sh[turtle_targets_sh['avg volume'] >= vol_turtle_sh]
+
+    inner_col1, inner_col2 = st.columns([3, 1])
+    with inner_col2:
+      view_ticker = st.radio('Ticker', options=turtle_targets_sh.index)
+    with inner_col1:
+      st.table(turtle_targets_sh)
+
+
+  # Tradingview embed
+  with col1:
+    components.html(f'''
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container">
+        <div id="tradingview_e049b"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+        new TradingView.widget(
+        {{
+        "width": "100%",
+        "height": 700,
+        "symbol": "{view_ticker}",
+        "interval": "D",
+        "timezone": "America/Los_Angeles",
+        "theme": "dark",
+        "style": "9",
+        "locale": "en",
+        "enable_publishing": false,
+        "withdateranges": true,
+        "allow_symbol_change": true,
+        "studies": [
+            "STD;Donchian_Channels",
+            "STD;MA%Ribbon",
+            "STD;RSI"
+        ],
+        "hide_volume": true,
+        "container_id": "tradingview_e049b"
+        }}
+        );
+        </script>
+        </div>
+        <!-- TradingView Widget END -->
+        ''', height=700)		
