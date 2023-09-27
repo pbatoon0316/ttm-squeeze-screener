@@ -385,7 +385,7 @@ with tab2:
 
     inner_col1, inner_col2 = st.columns([3, 1])
     with inner_col2:
-      view_ticker = st.radio('Ticker', options=turtle_targets.index)
+      view_ticker = st.radio('Ticker', options=turtle_targets.index, key=2)
     with inner_col1:
       st.table(turtle_targets)
 
@@ -440,7 +440,7 @@ with tab3:
 
     inner_col1, inner_col2 = st.columns([3, 1])
     with inner_col2:
-      view_ticker = st.radio('Ticker', options=turtle_targets_sh.index)
+      view_ticker = st.radio('Ticker', options=turtle_targets_sh.index, key=3)
     with inner_col1:
       st.table(turtle_targets_sh)
 
