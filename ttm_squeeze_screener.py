@@ -312,7 +312,7 @@ with tab1:
       "studies": [
           "STD;Bollinger_Bands",
           "STD;Keltner_Channels",
-          "STD;MA%Ribbon"
+          "STD;Awesome_Oscillator"
       ],
       "hide_volume": true,
       "container_id": "tradingview_e049b"
