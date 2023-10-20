@@ -291,36 +291,34 @@ with tab1:
   # Tradingview embed
   with col1:
     components.html(f'''
-      <!-- TradingView Widget BEGIN -->
-      <div class="tradingview-widget-container">
-      <div id="tradingview_e049b"></div>
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_bd0db"></div>
+      <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
       <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
       <script type="text/javascript">
       new TradingView.widget(
-      {{
-      "width": "100%",
-      "height": 700,
+      {
       "symbol": "{view_ticker}",
       "interval": "D",
-      "timezone": "America/Los_Angeles",
+      "timezone": "Etc/UTC",
       "theme": "dark",
-      "style": "9",
+      "style": "1",
       "locale": "en",
       "enable_publishing": false,
       "withdateranges": true,
       "allow_symbol_change": true,
       "studies": [
-          "STD;Bollinger_Bands",
-          "STD;Keltner_Channels",
-          "STD;Awesome_Oscillator"
+        "STD;Awesome_Oscillator",
+        "STD;Bollinger_Bands",
+        "STD;Keltner_Channels"
       ],
-      "hide_volume": true,
-      "container_id": "tradingview_e049b"
-      }}
+      "container_id": "tradingview_bd0db"
+    }
       );
       </script>
-      </div>
-      <!-- TradingView Widget END -->
+    </div>
+    <!-- TradingView Widget END -->
       ''',height=700)
 
 ## Tab2 - Turtle Trend
