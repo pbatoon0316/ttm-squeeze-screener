@@ -292,15 +292,15 @@ with tab1:
   with col1:
     components.html('''
       <!-- TradingView Widget BEGIN -->
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div id="tradingview_862f2" style="height:calc(100% - 32px);width:100%"></div>
+      <div class="tradingview-widget-container">
+        <div id="tradingview_b5094"></div>
         <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
         new TradingView.widget(
         {
-        "height":700,
-        "autosize": true,
+        "width": 980,
+        "height": 700,
         "symbol": "NASDAQ:AAPL",
         "interval": "D",
         "timezone": "Etc/UTC",
@@ -315,8 +315,8 @@ with tab1:
           "STD;Bollinger_Bands",
           "STD;Keltner_Channels"
         ],
-        "container_id": "tradingview_862f2"
-        }
+        "container_id": "tradingview_b5094"
+      }
         );
         </script>
       </div>
