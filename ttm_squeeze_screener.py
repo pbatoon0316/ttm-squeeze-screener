@@ -298,7 +298,7 @@ with tab1:
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
         new TradingView.widget(
-        {
+        {{
         "autosize": true,
         "symbol": "NASDAQ:AAPL",
         "interval": "D",
@@ -315,7 +315,7 @@ with tab1:
           "STD;Keltner_Channels"
         ],
         "container_id": "tradingview_862f2"
-      }
+        }}
         );
         </script>
       </div>
