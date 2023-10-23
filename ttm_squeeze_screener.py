@@ -290,7 +290,7 @@ with tab1:
 
   # Tradingview embed
   with col1:
-    components.html('''
+    components.html(f'''
       <!-- TradingView Widget BEGIN -->
       <div class="tradingview-widget-container">
         <div id="tradingview_b5094"></div>
@@ -298,10 +298,10 @@ with tab1:
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
         new TradingView.widget(
-        {
+        {{
         "width": "100%",
         "height": 700,
-        "symbol": "NASDAQ:AAPL",
+        "symbol": "{view_ticker}",
         "interval": "D",
         "timezone": "Etc/UTC",
         "theme": "dark",
@@ -316,7 +316,7 @@ with tab1:
           "STD;Keltner_Channels"
         ],
         "container_id": "tradingview_b5094"
-      }
+      }}
         );
         </script>
       </div>
