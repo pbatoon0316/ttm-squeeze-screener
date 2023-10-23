@@ -346,34 +346,34 @@ with tab2:
   # Tradingview embed
   with col1:
     components.html(f'''
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-        <div id="tradingview_e049b"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script type="text/javascript">
-        new TradingView.widget(
-        {{
-        "width": "100%",
-        "height": 700,
-        "symbol": "{view_ticker}",
-        "interval": "D",
-        "timezone": "America/Los_Angeles",
-        "theme": "dark",
-        "style": "9",
-        "locale": "en",
-        "enable_publishing": false,
-        "withdateranges": true,
-        "allow_symbol_change": true,
-        "studies": [
-            "STD;Donchian_Channels",
-            "STD;MA%Ribbon",
-            "STD;RSI"
-        ],
-        "hide_volume": true,
-        "container_id": "tradingview_e049b"
-        }}
-        );
-        </script>
-        </div>
-        <!-- TradingView Widget END -->
-        ''', height=700)
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_a0fda"></div>
+      <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {{
+      "width": "100%",
+      "height": 700,
+      "symbol": "{view_ticker}",
+      "interval": "D",
+      "timezone": "Etc/UTC",
+      "theme": "dark",
+      "style": "1",
+      "locale": "en",
+      "enable_publishing": false,
+      "allow_symbol_change": true,
+      "details": true,
+      "studies": [
+        "STD;DMI",
+        "STD;Donchian_Channels",
+        "STD;RSI"
+      ],
+      "container_id": "tradingview_a0fda"
+    }}
+      );
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    ''', height=700)
