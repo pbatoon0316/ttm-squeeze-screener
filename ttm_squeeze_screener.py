@@ -291,34 +291,35 @@ with tab1:
   # Tradingview embed
   with col1:
     components.html(f'''
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container">
-      <div id="tradingview_bd0db"></div>
-      <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-      <script type="text/javascript">
-      new TradingView.widget(
-      {
-      "symbol": "{view_ticker}",
-      "interval": "D",
-      "timezone": "Etc/UTC",
-      "theme": "dark",
-      "style": "1",
-      "locale": "en",
-      "enable_publishing": false,
-      "withdateranges": true,
-      "allow_symbol_change": true,
-      "studies": [
-        "STD;Awesome_Oscillator",
-        "STD;Bollinger_Bands",
-        "STD;Keltner_Channels"
-      ],
-      "container_id": "tradingview_bd0db"
-    }
-      );
-      </script>
-    </div>
-    <!-- TradingView Widget END -->
+      <!-- TradingView Widget BEGIN -->
+      <div class="tradingview-widget-container" style="height:100%;width:100%">
+        <div id="tradingview_862f2" style="height:calc(100% - 32px);width:100%"></div>
+        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+        new TradingView.widget(
+        {
+        "autosize": true,
+        "symbol": "NASDAQ:AAPL",
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": "dark",
+        "style": "1",
+        "locale": "en",
+        "enable_publishing": false,
+        "allow_symbol_change": true,
+        "details": true,
+        "studies": [
+          "STD;Awesome_Oscillator",
+          "STD;Bollinger_Bands",
+          "STD;Keltner_Channels"
+        ],
+        "container_id": "tradingview_862f2"
+      }
+        );
+        </script>
+      </div>
+      <!-- TradingView Widget END -->
       ''',height=700)
 
 ## Tab2 - Turtle Trend
