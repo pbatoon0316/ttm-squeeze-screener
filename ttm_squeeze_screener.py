@@ -299,7 +299,6 @@ with tab1:
         <script type="text/javascript">
         new TradingView.widget(
         {
-        "width": 980,
         "height": 700,
         "symbol": "NASDAQ:AAPL",
         "interval": "D",
