@@ -299,6 +299,7 @@ with tab1:
         <script type="text/javascript">
         new TradingView.widget(
         {{
+        "height": {height},
         "autosize": true,
         "symbol": "NASDAQ:AAPL",
         "interval": "D",
