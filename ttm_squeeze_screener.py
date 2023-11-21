@@ -272,7 +272,7 @@ with tab1:
     with squeeze_config_col1:
         kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4,step=0.5)
     with squeeze_config_col2:
-        vol = st.number_input('Volume', min_value=0.5, value=3.0)
+        vol = st.number_input('Volume', min_value=0.0, value=3.0)
 
     squeeze_targets = squeeze_screener(data, kc)
     squeeze_targets = squeeze_targets.set_index('ticker')
