@@ -155,8 +155,8 @@ def squeeze_screener(data, atr_mult=1.4):
     df['TTM Trend'] = None
 
     # Condition = Multiple EMAs are stacked upwards or downward
-    c_stacked_ema_up = (df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] > df['EMA200'].iloc[-1])
-    c_stacked_ema_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) and (df['EMA100'].iloc[-1] < df['EMA200'].iloc[-1])
+    c_stacked_ema_up = (df['close'].iloc[-1] > df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] > df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] > df['EMA100'].iloc[-1])
+    c_stacked_ema_down = (df['close'].iloc[-1] < df['EMA20'].iloc[-1]) and (df['EMA20'].iloc[-1] < df['EMA50'].iloc[-1]) and (df['EMA50'].iloc[-1] < df['EMA100'].iloc[-1]) 
 
     # Condition = TTM Histogram positive or negative
     c_ttmhist_up = df['TTM Hist'].iloc[-1] > 0
