@@ -237,9 +237,10 @@ def ema_crossover(data, ema_fast=20, ema_slow=100):
 
     # Condition 1 = (ema_hist[-1] > 0) and (ema_hist[-2] < 0) = crossover up
     # Condition 2 = (ema_hist[-1] < 0) and (ema_hist[-2] > 0) = crossover down
+    # iloc[-4] was chosen to include crossovers 3-days prior
     
-    c1 = (df['ema_hist'].iloc[-1] > 0) and (df['ema_hist'].iloc[-2] < 0)
-    c2 = (df['ema_hist'].iloc[-1] < 0) and (df['ema_hist'].iloc[-2] > 0)
+    c1 = (df['ema_hist'].iloc[-1] > 0) and (df['ema_hist'].iloc[-4] < 0)
+    c2 = (df['ema_hist'].iloc[-1] < 0) and (df['ema_hist'].iloc[-4] > 0)
 
     # If crossover is detected, label up or down, then store the Ticker
     
