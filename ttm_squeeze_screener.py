@@ -203,6 +203,64 @@ def squeeze_screener(data, atr_mult=1.4):
 
   return squeeze_tickers
 
+
+@st.cache_data(ttl=3500)
+def ema_crossover(data, ema_fast=20, ema_slow=100):
+
+  # Extract each ticker out of the MultiIndex df
+  tickers = list(data.columns.get_level_values(1).unique())
+
+  # EMA length parameters
+  ema_fast = ema_fast
+  ema_slow = ema_slow
+
+  ema_crossover_stocks = pd.DataFrame()
+
+  # For all tickers submitted, download historical stock data, and calculate
+  # technical indiators using the parameters above
+  for ticker in tickers:
+    # Create a working dataframe for the active ticker. This transforms it to a Single Index df
+    df = data.loc[:, (slice(None), ticker)].copy()
+    df.columns = df.columns.droplevel(1)
+
+    # Convert columns to lowercase for finta/TA
+    df.columns = df.columns.str.lower()
+
+    # Add ticker ID column. Calculate Average Volume
+    df['ticker'] = ticker
+    df['avg volume'] = df['volume'].rolling(len(df)).mean() / 1000000
+
+    # Calculate indicators
+    df['ema_fast'] = TA.EMA(df, period=ema_fast)
+    df['ema_slow'] = TA.EMA(df, period=ema_slow)
+    df['ema_hist'] = df['ema_fast'] - df['ema_slow']
+
+    # Condition 1 = (ema_hist[-1] > 0) and (ema_hist[-2] < 0) = crossover up
+    # Condition 2 = (ema_hist[-1] < 0) and (ema_hist[-2] > 0) = crossover down
+    
+    c1 = (df['ema_hist'].iloc[-1] > 0) and (df['ema_hist'].iloc[-2] < 0)
+    c2 = (df['ema_hist'].iloc[-1] < 0) and (df['ema_hist'].iloc[-2] > 0)
+
+    # If crossover is detected, label up or down, then store the Ticker
+    
+    df['direction'] = None
+
+    if c1:
+      df.loc[df.index[-1], 'direction'] = 'up'
+      ema_crossover_stocks = pd.concat([ema_crossover_stocks, df.iloc[[-1]]], axis=0)
+
+    elif c2:
+      df.loc[df.index[-1], 'direction'] = 'down'
+      ema_crossover_stocks = pd.concat([ema_crossover_stocks, df.iloc[[-1]]], axis=0)
+
+  try:
+    ema_crossover_stocks = ema_crossover_stocks.sort_values('avg volume', ascending=False)
+  except:
+    st.text('No Tickers Found')
+
+  return ema_crossover_stocks
+
+
 @st.cache_data(ttl=3500)
 def turtle_screener(data, dc_period=20):
 
@@ -259,7 +317,7 @@ def turtle_screener(data, dc_period=20):
 ## Download data and set up data tables
 data = download_data(combined_list)
 
-tab1, tab2 = st.tabs(['TTM Squeeze', 'Turtle Trend'])
+tab1, tab2, tab3 = st.tabs(['TTM Squeeze', 'EMA Crossover', 'Turtle Trend'])
 
 ## Tab1 - TTM Squeeze Layout
 
@@ -272,7 +330,7 @@ with tab1:
     with squeeze_config_col1:
         kc = st.number_input('KC', min_value=0.5, max_value=2.0, value=1.4,step=0.5)
     with squeeze_config_col2:
-        vol = st.number_input('Volume', min_value=0.0, value=3.0)
+        vol = st.number_input('Volume', min_value=0.0, value=3.0, key=1)
 
     squeeze_targets = squeeze_screener(data, kc)
     squeeze_targets = squeeze_targets.set_index('ticker')
@@ -294,7 +352,6 @@ with tab1:
       <!-- TradingView Widget BEGIN -->
       <div class="tradingview-widget-container">
         <div id="tradingview_b5094"></div>
-        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
         new TradingView.widget(
@@ -323,14 +380,66 @@ with tab1:
       <!-- TradingView Widget END -->
       ''',height=700)
 
-## Tab2 - Turtle Trend
+## Tab2 -  EMA Crossover
 
 with tab2:
   
   col1, col2 = st.columns([2, 1])
 
   with col2:
-    vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25)    
+    vol_ema_crossover = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25, key=2)    
+    ema_crossover_stocks = ema_crossover(data)
+    ema_crossover_stocks = ema_crossover_stocks.set_index('ticker')
+    ema_crossover_stocks = ema_crossover_stocks[['avg volume', 'close', 'ema_hist', 'direction']].sort_values(by='avg volume', ascending=False)
+    ema_crossover_stocks = ema_crossover_stocks[ema_crossover_stocks['avg volume'] >= vol_ema_crossover]
+
+    inner_col1, inner_col2 = st.columns([3, 1])
+    with inner_col2:
+      view_ticker = st.radio('Ticker', options=ema_crossover_stocks.index)
+    with inner_col1:
+      st.table(ema_crossover_stocks)
+
+  # Tradingview embed
+  with col1:
+    components.html(f'''
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_a0fda"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {{
+      "width": "100%",
+      "height": 700,
+      "symbol": "{view_ticker}",
+      "interval": "D",
+      "timezone": "Etc/UTC",
+      "theme": "dark",
+      "style": "1",
+      "locale": "en",
+      "enable_publishing": false,
+      "allow_symbol_change": true,
+      "details": true,
+      "studies": [
+        "STD;MA%Ribbon"
+      ],
+      "container_id": "tradingview_a0fda"
+    }}
+      );
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    ''', height=700)
+
+
+## Tab3 - Turtle Trend
+
+with tab3:
+  
+  col1, col2 = st.columns([2, 1])
+
+  with col2:
+    vol_turtle = st.number_input('Volume', min_value=0.25, value=1.00, step=0.25, key=3)    
     turtle_targets = turtle_screener(data)
     turtle_targets = turtle_targets.set_index('ticker')
     turtle_targets = turtle_targets[['avg volume', 'close', 'long stop', 'ema', 'rsi']].sort_values(by='avg volume', ascending=False)
@@ -349,7 +458,6 @@ with tab2:
     <!-- TradingView Widget BEGIN -->
     <div class="tradingview-widget-container">
       <div id="tradingview_a0fda"></div>
-      <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
       <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
       <script type="text/javascript">
       new TradingView.widget(
