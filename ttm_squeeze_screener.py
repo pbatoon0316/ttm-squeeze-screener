@@ -358,7 +358,7 @@ with tab1:
         new TradingView.widget(
         {{
         "width": "100%",
-        "height": "100%",
+        "height": 700,
         "symbol": "{view_ticker}",
         "interval": "D",
         "timezone": "Etc/UTC",
@@ -379,7 +379,7 @@ with tab1:
         </script>
       </div>
       <!-- TradingView Widget END -->
-      ''',height=700)
+      ''')
 
 ## Tab2 -  EMA Crossover
 
