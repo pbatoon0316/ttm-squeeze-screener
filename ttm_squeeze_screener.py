@@ -358,7 +358,7 @@ with tab1:
         new TradingView.widget(
         {{
         "width": "100%",
-        "height": 700,
+        "height": "100%",
         "symbol": "{view_ticker}",
         "interval": "D",
         "timezone": "Etc/UTC",
