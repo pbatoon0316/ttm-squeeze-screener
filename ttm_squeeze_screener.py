@@ -370,8 +370,7 @@ with tab1:
         "details": true,
         "studies": [
           "STD;Awesome_Oscillator",
-          "STD;Bollinger_Bands",
-          "STD;Keltner_Channels"
+          "STD;MA%Ribbon"
         ],
         "container_id": "tradingview_b5094"
       }}
@@ -379,7 +378,7 @@ with tab1:
         </script>
       </div>
       <!-- TradingView Widget END -->
-      ''', height=710)
+      ''', height=720)
 
 ## Tab2 -  EMA Crossover
 
