@@ -379,7 +379,7 @@ with tab1:
         </script>
       </div>
       <!-- TradingView Widget END -->
-      ''', height=None)
+      ''', height=710)
 
 ## Tab2 -  EMA Crossover
 
