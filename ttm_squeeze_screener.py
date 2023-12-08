@@ -421,7 +421,7 @@ with tab2:
       "allow_symbol_change": true,
       "details": true,
       "studies": [
-        "STD;MA%Ribbon"
+        "STD;MA%Ribbon",
         "STD;RSI"
       ],
       "container_id": "tradingview_a0fda"
