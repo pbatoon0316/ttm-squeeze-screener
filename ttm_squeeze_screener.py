@@ -422,6 +422,7 @@ with tab2:
       "details": true,
       "studies": [
         "STD;MA%Ribbon"
+        "STD;RSI"
       ],
       "container_id": "tradingview_a0fda"
     }}
