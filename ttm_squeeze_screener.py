@@ -257,11 +257,11 @@ def ema_crossover(data, ema_fast=20, ema_slow=50):
     
     df['direction'] = None
 
-    if c1:
+    if c_long:
       df.loc[df.index[-1], 'direction'] = 'up'
       ema_crossover_stocks = pd.concat([ema_crossover_stocks, df.iloc[[-1]]], axis=0)
 
-    elif c2:
+    elif c_short:
       df.loc[df.index[-1], 'direction'] = 'down'
       ema_crossover_stocks = pd.concat([ema_crossover_stocks, df.iloc[[-1]]], axis=0)
 
