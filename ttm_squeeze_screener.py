@@ -244,12 +244,12 @@ def ema_crossover(data, ema_fast=20, ema_slow=50):
     
     c_ema_up = (df['ema_hist'].iloc[-1] > 0) and (df['ema_hist'].iloc[-4] < 0)
     c_rsi_up = df['RSI'].iloc[-1] > 60
-    c_adx_up = df['ADX'] > 20
+    c_adx_up = df['ADX'].iloc[-1] > 20
     c_long = c_ema_up & c_rsi_up & c_adx_up
 
     c_ema_dn = (df['ema_hist'].iloc[-1] < 0) and (df['ema_hist'].iloc[-4] > 0)
     c_rsi_dn = df['RSI'].iloc[-1] < 40
-    c_adx_dn = df['ADX'] > 20
+    c_adx_dn = df['ADX'].iloc[-1] > 20
     c_short = c_ema_dn & c_rsi_dn & c_adx_dn
     
 
