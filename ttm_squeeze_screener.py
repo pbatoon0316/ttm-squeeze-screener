@@ -231,6 +231,8 @@ def ema_crossover(data, ema_fast=20, ema_slow=50):
     df['avg volume'] = df['volume'].rolling(len(df)).mean() / 1000000
 
     # Calculate indicators
+    df['rolling high'] = df['close'].rolling(20).max()
+    df['rolling low'] = df['close'].rolling(20).min()
     df['ema_fast'] = TA.EMA(df, period=ema_fast)
     df['ema_slow'] = TA.EMA(df, period=ema_slow)
     df['ema_hist'] = df['ema_fast'] - df['ema_slow']
@@ -242,15 +244,17 @@ def ema_crossover(data, ema_fast=20, ema_slow=50):
     # Condition 2 = (ema_hist[-1] < 0) and (ema_hist[-2] > 0) = crossover down
     # iloc[-4] was chosen to include crossovers 3-days prior
     
-    c_ema_up = (df['ema_hist'].iloc[-1] > 0) and (df['ema_hist'].iloc[-4] < 0)
+    c_rolling_high = df['close'].iloc[-1] >= df['rolling high'].iloc[-1]
+    c_ema_up = (df['ema_hist'].iloc[-1] > 0) #and (df['ema_hist'].iloc[-4] < 0)
     c_rsi_up = df['RSI'].iloc[-1] > 60
     c_adx_up = df['ADX'].iloc[-1] > 20
-    c_long = c_ema_up & c_rsi_up & c_adx_up
+    c_long = c_ema_up & c_rsi_up & c_adx_up & c_rolling_high
 
-    c_ema_dn = (df['ema_hist'].iloc[-1] < 0) and (df['ema_hist'].iloc[-4] > 0)
+    c_rolling_low = df['close'].iloc[-1] <= df['rolling low'].iloc[-1]
+    c_ema_dn = (df['ema_hist'].iloc[-1] < 0) #and (df['ema_hist'].iloc[-4] > 0)
     c_rsi_dn = df['RSI'].iloc[-1] < 40
     c_adx_dn = df['ADX'].iloc[-1] > 20
-    c_short = c_ema_dn & c_rsi_dn & c_adx_dn
+    c_short = c_ema_dn & c_rsi_dn & c_adx_dn & c_rolling_low
     
 
     # If crossover is detected, label up or down, then store the Ticker
