@@ -205,7 +205,7 @@ def squeeze_screener(data, atr_mult=1.4):
 
 
 @st.cache_data(ttl=3500)
-def ema_crossover(data, ema_fast=20, ema_slow=100):
+def ema_crossover(data, ema_fast=20, ema_slow=50):
 
   # Extract each ticker out of the MultiIndex df
   tickers = list(data.columns.get_level_values(1).unique())
@@ -234,13 +234,24 @@ def ema_crossover(data, ema_fast=20, ema_slow=100):
     df['ema_fast'] = TA.EMA(df, period=ema_fast)
     df['ema_slow'] = TA.EMA(df, period=ema_slow)
     df['ema_hist'] = df['ema_fast'] - df['ema_slow']
+    df['fast RSI'] = TA.RSI(df, period=14)
+    df['RSI'] = df['fast RSI'].rolling(5).mean()
+    df['ADX'] = TA.ADX(df, period=20)
 
     # Condition 1 = (ema_hist[-1] > 0) and (ema_hist[-2] < 0) = crossover up
     # Condition 2 = (ema_hist[-1] < 0) and (ema_hist[-2] > 0) = crossover down
     # iloc[-4] was chosen to include crossovers 3-days prior
     
-    c1 = (df['ema_hist'].iloc[-1] > 0) and (df['ema_hist'].iloc[-4] < 0)
-    c2 = (df['ema_hist'].iloc[-1] < 0) and (df['ema_hist'].iloc[-4] > 0)
+    c_ema_up = (df['ema_hist'].iloc[-1] > 0) and (df['ema_hist'].iloc[-4] < 0)
+    c_rsi_up = df['RSI'].iloc[-1] > 60
+    c_adx_up = df['ADX'] > 20
+    c_long = c_ema_up & c_rsi_up & c_adx_up
+
+    c_ema_dn = (df['ema_hist'].iloc[-1] < 0) and (df['ema_hist'].iloc[-4] > 0)
+    c_rsi_dn = df['RSI'].iloc[-1] < 40
+    c_adx_dn = df['ADX'] > 20
+    c_short = c_ema_dn & c_rsi_dn & c_adx_dn
+    
 
     # If crossover is detected, label up or down, then store the Ticker
     
